@@ -1,0 +1,205 @@
+ /* for k-12 and now we consider it as the home for testing purpose
+  */
+ 
+
+
+  .underline{
+    display: block;
+    height: 2px;
+    width: 50%;
+    position: relative;
+    background-color: rgb(255,87,34);
+    margin: 0 auto;
+  }
+
+  .double-underline{
+    display: block;
+    height: 4px;
+    width: 10%;
+    position: relative;
+    background-color: rgb(255,87,34);
+    margin: auto;
+    transform: translate(2%,-70%);
+  }
+
+  .double-underline-adjust{
+    transform: translate(0%,-70%);
+  }
+
+  .card_active{
+   background-color: rgb(1, 107 ,107) !important;
+   color: white;
+  } 
+
+   .card_hover:hover{
+    cursor: pointer;
+    transition: 0.5s ease-in-out;
+    /* border-radius: inherit; */
+    background-color: rgb(1, 107 ,107);
+    color: white;
+    box-shadow: 0px 4px 2px rgba(0, 86, 86, 0.5);
+  } 
+
+  .shadow-bottom {
+    box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+  }
+
+
+  .gap{
+    margin-top: 0.9rem;
+  }
+
+
+
+  .down{
+    transform: translateY(2%);
+  }
+
+  .view-icons-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    top: -50%;
+    right: -2.5%;
+}
+
+  .view-icons{
+    display: flex;
+  } 
+
+  .clicked-added{
+    color:  white;
+    cursor: pointer;    
+    background-color: rgb(1,76,76) ;
+    border-radius: 5px;
+  }
+
+  .grid-view-icon{
+    color:  rgb(1,76,76) ;
+    cursor: pointer;
+    background-color:rgb(255, 255, 255);
+    border-radius: 5px;
+  }
+
+
+  
+  .view-icons svg{
+    font-size: 2.5rem;
+    padding: 9px;
+    position: relative;
+    transform: translateY(-21%);
+
+  }
+
+  .grid-view-icon:hover{
+    color:  rgb(255, 255, 255);
+    cursor: pointer;
+    background-color: rgb(1,76,76) ;
+    border-radius: 5px;
+  }
+
+  #flexCheckDefault{
+    font-size: 1rem;
+  }
+
+  .card-img-container {
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .image-container {
+    position: relative;
+  }
+  
+  .black-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    border-radius: 10px;
+    animation: img 1s linear forwards !important;
+  }
+  
+  .black-overlay.expanded {
+    width: 100%;
+  }
+  
+  .card-img-hover .image-container:hover .black-overlay {
+    width: 100%;
+  }
+
+  .left-card-container{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 1rem;
+    align-items: flex-start;
+    padding-top: 1rem;
+    padding-left: 1rem;
+  }
+
+  .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+  a.remove_text_decoration{
+    text-decoration: none !important;
+    color: inherit;
+  }
+
+  @keyframes img {
+    0%{
+       background-color: rgba(0, 0, 0, 0.6);
+       width: 25%;
+       
+   
+   }
+   25%{
+       background-color: rgba(0, 0, 0, 0.6);
+       width: 50%;
+       
+   }
+   50%{
+       background-color: rgba(0, 0, 0, 0.6);
+       width: 75%;
+       
+   }
+   100%{
+       background-color: rgba(0, 0, 0, 0.6);
+       width: 100%;
+       
+   } 
+ }
+
+
+  /* .help{
+    position: relative;
+    right: 50%;
+    bottom: 10%;
+    transform: translate(0%,-30%);
+    color:  rgb(1,76,76) ;
+    border: 1px solid red;
+    width: fit-content;
+ } 
+ */
+
+
+
+ @media screen and (max-width:991px) {
+  .view-icons-container{
+    display: none;
+  }
+  .gap_on_grid_icon_hide{
+    margin-top: 20px;
+  }
+ }
+

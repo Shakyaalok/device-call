@@ -1,0 +1,55 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Node modules
+Backend/node_modules/*
+
+# Environment variables
+.env
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Optional stylelint cache
+.stylelintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+.env.production
+
+# Optional VS Code extensionsg directory
+.vscode-server/
+
+# Optional IDE files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# MacOS files
+.DS_Store
+
+# Thumbnails
+Thumbs.db
+node_modules/
+
+
+
+Frontend/.vscode/launch.json

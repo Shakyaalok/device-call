@@ -1,0 +1,123 @@
+.bg-body-teal {
+    background-color: rgb(1, 76, 76);
+    /* width: 100%; */
+}
+
+.fixed-header {
+    position: fixed !important;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+}
+.logo{
+    width: 10rem;
+    /* height:fit-content; */
+}
+
+.navbar-collapse{
+    justify-content: end;
+}
+
+.navbar-nav{
+    display: flex;
+    gap: 1rem;
+}
+
+
+.nav-link{
+    position: relative;
+    color: white;
+    font-weight: 500;
+}
+
+.nav-link:hover::after{
+    content: '';
+    position: absolute;
+    display: block;
+    background-color: rgb(255,87,34);
+    margin: 0 auto;
+    height: 2px;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    animation: movingline 0.2s linear;
+}
+
+.navbar-toggler-icon{
+    font-size: 1.5rem;
+    color: white;
+    font-weight: 600;
+}
+
+
+@keyframes movingline {
+    0%{
+        width: 0%;
+    }25%{
+        width: 25%;
+    }50%{
+        width: 50%;
+    }75%{
+        width: 75%;
+    }100%{
+        width: 100%;
+    }
+}
+
+
+.nav-item a:hover{
+    color: rgb(224, 215, 215);
+    font-weight: 500;
+}
+   
+
+
+.navbar{
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+.lens{
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    right: 1%;
+    transform: translate(-50%, -50%);
+}
+
+
+
+.search-lens-parent {
+    position: relative;
+    width: 450px; 
+    margin-right: 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .icons-lens {
+    position: absolute;
+    top: 50%; 
+    right: 1%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem; 
+    color: #003d41;
+  }
+ 
+  @media (max-width: 900px) {
+    .search-lens-parent {
+        width: 98%;
+        margin-right: 40px;
+    }
+}
+@media (max-width: 1160px) {
+    .search-lens-parent {
+        width: 98%;
+        margin-right: 1px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+}

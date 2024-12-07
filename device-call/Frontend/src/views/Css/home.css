@@ -1,0 +1,98 @@
+
+.bg__white{
+    background: white;
+
+}
+
+.icons{
+    color: orange;
+    font-size: 3rem;
+}
+
+.icons_adjustment{
+     display: flex;
+     flex-direction: column;
+    align-items: center; 
+    justify-content: flex-start;
+
+}
+
+.padding{
+    padding-top:1rem ;
+
+}
+.bttn button{
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    border:none;
+    background-color: rgb(205, 204, 204);
+}
+.bttn button:hover{
+    background: rgb(0, 54, 54) ;
+}
+
+.bttn button:focus,.bttn button:active,.bttn button:focus-visible{
+    outline:none;
+    box-shadow: none;
+    background-color:rgb(0, 54, 54) ; ;
+}
+
+.btns-home-left{
+    display: flex;
+    gap: 10px;
+
+}
+.btn-home-right{
+    display: flex;
+    justify-content: end;
+}
+
+
+
+
+.nowrap {
+    white-space: nowrap; 
+  }
+
+.left-content-adjust{
+    display: flex;
+    justify-content: end;
+}
+
+
+
+.gapHorizontal{
+    display: flex;
+    gap: 1rem;
+}
+
+.rounded{
+    border-radius: 20px;
+    background: rgb(1,76,76) ;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.no-match{
+    background-color: red;
+    text-align: center;
+    font-weight: 500;
+    color: white;
+    font-size: 1.5rem;
+    width: 100%;
+}
+
+@media screen and (max-width:767px) {
+    .btns-home-left{
+        flex-direction: column;
+    
+    }
+    .btn-home-right button{
+        justify-content: start;
+        margin-top: 10px;
+        width: 100%;
+    }
+     
+}

@@ -1,0 +1,77 @@
+{
+  "name": "@coreui/coreui-free-react-admin-template",
+  "version": "3.0.0",
+  "description": "CoreUI React Open Source Bootstrap 4 Admin Template",
+  "author": {
+    "name": "CoreUI",
+    "url": "https://coreui.io",
+    "github": "https://github.com/coreui",
+    "twitter": "https://twitter.com/core_ui"
+  },
+  "contributors": [
+    {
+      "name": "CoreUI Team",
+      "url": "https://github.com/orgs/coreui/people"
+    }
+  ],
+  "homepage": ".",
+  "copyright": "Copyright Qvolv",
+  "license": "Qvolv",
+  "private": true,
+  "dependencies": {
+    "@coreui/coreui": "^3.4.0",
+    "@coreui/react": "^5.1.0",
+    "@coreui/utils": "^1.3.1",
+    "@svgr/webpack": "^8.1.0",
+    "axios": "^0.20.0",
+    "core-js": "^3.6.5",
+    "enzyme": "^3.11.0",
+    "formik": "^2.4.6",
+    "prop-types": "^15.7.2",
+    "randomcolor": "^0.6.2",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-icons": "^5.2.1",
+    "react-player": "^2.16.0",
+    "react-redux": "7.2.0",
+    "react-router-dom": "^6.24.1",
+    "react-select": "^3.2.0",
+    "redux": "4.0.5",
+    "sass": "^1.77.5"
+  },
+  "devDependencies": {
+    "react-scripts": "^5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "test:cov": "npm test -- --coverage --watchAll=false",
+    "test:debug": "react-scripts --inspect-brk test --runInBand",
+    "eject": "react-scripts eject"
+  },
+  "bugs": {
+    "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 10",
+    "not op_mini all"
+  ],
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!**/*index.js",
+      "!src/serviceWorker.js",
+      "!src/polyfill.js"
+    ]
+  },
+  "engines": {
+    "node": ">=10",
+    "npm": ">=6"
+  }
+}
