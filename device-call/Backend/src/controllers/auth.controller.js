@@ -73,7 +73,8 @@ exports.login = async(req, res) => {
         return res.status(200).send({error:true, message:'No User Account Exists'})
     }
 
-    const match = await bcrypt.compare(password,user.password);
+    // const match = await bcrypt.compare(password,user.password);
+    const match = password==user.password
     if(match){
         accessToken = jwt.sign({ username: user.name }, accessTokenSecret, { expiresIn: jwt_timeout })
         refreshToken = jwt.sign({ username:  user.name},refreshTokenSecret);

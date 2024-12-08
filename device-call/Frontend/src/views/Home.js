@@ -1,153 +1,340 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useNavigate,useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, Col, Row, Modal, Form, FormControl, Table } from 'react-bootstrap';
+import { Formik } from 'formik';
 import axios from '../services/api';
-import { useDispatch, useSelector } from 'react-redux';
-import Header from '../containers/Header'
-import {
-  CCard,
-  CCardBody,
-  CCol,
-  CRow,
-  CContainer,
-  CCardImage,
-  CCardText,
-} from '@coreui/react';
-import Navigation from '../containers/Navigation';
-
 import './Css/home.css';
-import { LuLoader2 } from "react-icons/lu";
-import { isTokenExpire,categoryId } from './gradeSubject';
 
 const Home = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [scrollContents, setScrollContents] = useState([]);
-  const {content:filterContent,status} = useSelector(state => state.filterContent);
-  const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const location = useLocation();
+  const history = useNavigate();
+  const [data, setData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [mess, setMess] = useState('');
+  const [currentVendor, setCurrentVendor] = useState(null); // State to hold the current vendor data for editing
+  const [check,setChecked] = useState(false);
 
   const user_info = JSON.parse(localStorage.getItem('user_info'));
 
-
-  const navigateHandler = (content) => {
-    navigate(`/home/${content?.description}`);
-    dispatch({ type: 'set', content: content })
-}
-
+  const getList = async () => {
+    const res = await axios.get('/devices', {
+      // headers: {
+      //   authorization: user_info.accessToken,
+      //   token: user_info.refreshToken,
+      // },
+    });
+    if (!res.data.error) {
+      setData(res.data.data);
+    }
+  };
 
   useEffect(() => {
-    if (!user_info || isTokenExpire(user_info?.accessToken)) {
-      localStorage.removeItem('user_info');
-      navigate('/login');
+    getList();
+  }, []);
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
+
+  const handleEditClick = async (vendor) => {
+    setCurrentVendor(vendor); // Set the current vendor to the selected one for editing
+    setMess('');
+    toggleModal();
+  };
+
+  const handleDeleteClick = async (id) => {
+    const res = await axios.delete('/devices', {
+      // headers: {
+      //   authorization: user_info.accessToken,
+      //   token: user_info.refreshToken,
+      // },
+      params: { id: id },
+    });
+    if (!res.data.error) {
+      getList();
     }
-  }, [user_info, navigate]);
+  };
 
-
-
-  const loadItems = useCallback(async () => {
-      setLoading(true);
-      let categoryNameArray = location?.pathname?.split('/')
-      const category_id = categoryId(categoryNameArray)
-
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      try {
-        const response = await axios.get(`/contents?count=${count}&category_id=${category_id}`, {
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    console.log('values tesing------------>',values);
+    // return;
+    try {
+      let res;
+      if (currentVendor) {
+        res = await axios.put('/devices', values, {
+          headers: {
+            authorization: user_info.accessToken,
+            token: user_info.refreshToken,
+          },
+          params: {
+            id: currentVendor.id,
+            force_update:check? check: false
+          },
+        });
+      } else {
+     
+      
+        res = await axios.post('/devices', values, {
           headers: {
             authorization: user_info.accessToken,
             token: user_info.refreshToken,
           },
         });
-        
-        setScrollContents(prevContents => {
-          const combinedContents = [...prevContents, ...response.data];
-          const uniqueContents = Array.from(new Set(combinedContents.map(item => item.main_description))).map(main_description => combinedContents.find(item => item.main_description === main_description));
-          return uniqueContents;
-        });
-      
-
-        setHasMore(response.data.length > 0);
-      } catch (error) {
-      } finally {
-        setLoading(false);
       }
-  }, [count]);
 
-  useEffect(() => {
-    loadItems();
-  }, [loadItems]);
-
-
-
-  const handleScroll = useCallback(() => {
-    if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && !loading && hasMore) {
-      setCount(prevCount => prevCount + 1);
+      if (!res.data.error) {
+        getList();
+        toggleModal();
+        resetForm();
+        setCurrentVendor(null);
+      } else {
+        setMess(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  }, [loading, hasMore]);
+    setSubmitting(false);
+  };
 
-
-  useEffect(() => {
-    if (!filterContent?.length) {
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
+  const validate = (values) => {
+    const errors = {};
+    if (!values.inspector_name) {
+      errors.inspector_name = 'Required';
     }
-  }, [handleScroll, filterContent?.length]);
-
-
-
-  const data = () => {
-    const contentsToDisplay = filterContent?.length>0 ? filterContent : scrollContents;
-    return contentsToDisplay.map((content, index) => (
-      <CCol lg={3} md={4} sm={6} key={`${content.id}-${content.module_name}-${index}`}>
-        <CCard className='shadow border-radius' onClick={() => navigateHandler(content)}>
-           
-          <div className="image-container">
-              <CCardImage orientation="top" className='separation_line' src={`https://d2p61yp1r2u65b.cloudfront.net/Images/${content.imageUrl}`}  />
-          </div>
-
-         <CCardBody>
-            <CCardText className='card-container card_space'>
-              {content.grade ?
-                <>
-                  <div className='card-text-1'>{content.module_name}</div>
-                  <div className='card-text-2'>{content.main_description}</div>
-                </>
-                :
-                <>
-                  <div className='card-text-1'>{content.description}</div>
-                  <div className='card-text-2'>{content.main_description}</div>
-                </>
-              }
-            </CCardText>
-          </CCardBody>
-        </CCard>
-      </CCol>
-    ));
+    // if (!values.status) {
+    //   errors.status = 'Required';
+    // }
+    if (!values.school_name) {
+      errors.school_name = 'Required';
+    }
+    if (!values.device_id) {
+      errors.device_id = 'Required';
+    }
+    return errors;
   };
 
 
+  
+
+  const checkBoxHandler = (e) =>{
+    setChecked(e.target.checked)
+  }
+
+  const launchDeviceHandler = async(id)=>{
+    const res = await axios.get('/devices/launch', {
+      // headers: {
+      //   authorization: user_info.accessToken,
+      //   token: user_info.refreshToken,
+      // },
+      params:{
+        id:id
+      }
+    });
+    if (!res.data.error) {
+      alert(res.data.message)
+    }
+    alert(res.data.message)
+  }
+
   return (
-    <>   
-    {/* <Header/> */}
-     <CContainer className='bg__white' style={{marginTop:'5rem'}} >
-      <Navigation />
-      
-      <CRow>
-        <CCol>       
-           { !loading && filterContent?.length===0 && <h3 className='no-match'>No Match Found!</h3>}
-        </CCol>
-      </CRow>
+    <Row className="justify-content-center">
+      <Col md="12">
+        <Card>
+          <Card.Header>
+            <Row>
+              <Col>
+                <Button
+                  variant="info"
+                  className="mt-5"
+                  onClick={() => {
+                    setCurrentVendor(null);
+                    toggleModal();
+                  }}
+                >
+                  + Add New
+                </Button>
+              </Col>
+            </Row>
+          </Card.Header>
+          <Card.Body>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Device Id</th>
+                  <th>Inspector Name</th>
+                  <th>School Name</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.device_id}</td>
+                    <td>{item.inspector_name}</td>
+                    <td>{item.school_name}</td>
+                    <td>{item.status}</td>
+                    <td>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        onClick={() => handleEditClick(item)}
+                      >
+                        Edit
+                      </Button>{' '}
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleDeleteClick(item.id)}
+                      >
+                        Delete
+                      </Button>{' '}
+                      <Button variant="success" size="sm" onClick={()=>launchDeviceHandler(item.id)}>
+                        Launch
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Card.Body>
+        </Card>
+      </Col>
 
-      <CRow className='loader_container'>        
-        {status!==404 && data()}
-        { loading && <div className='loader'><LuLoader2 /></div>}
-      </CRow>
-     
-    </CContainer>
-    </>
+      <Modal show={showModal} onHide={toggleModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>{currentVendor ? 'Edit Vendor' : 'Add New Vendor'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Formik
+            initialValues={{
+              inspector_name: currentVendor ? currentVendor.inspector_name : '',
+              school_name: currentVendor ? currentVendor.school_name : '',
+              status: currentVendor ? currentVendor.status : '',
+              isChecked: currentVendor ? currentVendor.isChecked : false, // Default to false
+              device_id: currentVendor ? currentVendor.device_id : '', // Default to false
+            }}
+            validate={validate}
+            onSubmit={handleSubmit}
+            enableReinitialize={true}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              isSubmitting,
+            }) => (
+              <Form onSubmit={handleSubmit}>
+                 <Form.Group controlId="device_id">
+                  <Form.Label>Inspector Name</Form.Label>
+                  <FormControl
+                    type="text"
+                    name="device_id"
+                    placeholder="Enter Device id"
+                    value={values.device_id}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {touched.device_id && errors.device_id && (
+                    <Form.Text className="text-danger">{errors.device_id}</Form.Text>
+                  )}
+                </Form.Group>
+                <Form.Group controlId="inspector_name">
+                  <Form.Label>Inspector Name</Form.Label>
+                  <FormControl
+                    type="text"
+                    name="inspector_name"
+                    placeholder="Enter Inspector Name"
+                    value={values.inspector_name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {touched.inspector_name && errors.inspector_name && (
+                    <Form.Text className="text-danger">{errors.inspector_name}</Form.Text>
+                  )}
+                </Form.Group>
+                <Form.Group controlId="school_name">
+                  <Form.Label>School Name</Form.Label>
+                  <FormControl
+                    type="text"
+                    name="school_name"
+                    placeholder="Enter School Name"
+                    value={values.school_name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  />
+                  {touched.school_name && errors.school_name && (
+                    <Form.Text className="text-danger">{errors.school_name}</Form.Text>
+                  )}
+                </Form.Group>
+                <Form.Group controlId="status">
+                  <Form.Label>Status</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="status"
+                    value={values.status}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                  >
+                    <option value="" disabled>Select Vendor Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </Form.Control>
+                  {/* {touched.status && errors.status && (
+                    <Form.Text className="text-danger">{errors.status}</Form.Text>
+                  )} */}
+                </Form.Group>
+                
+                {/* Checkbox Field */}
+                {currentVendor && (
+                   <Form.Group controlId="isChecked">
+                   <Form.Check
+                     type="checkbox"
+                     name="isChecked"
+                     label="Force update"
+                     value={check}
+                    //  checked={values.isChecked}
+                     onChange={(e)=>checkBoxHandler(e)}
+                     onBlur={handleBlur}
+                   />
+                 </Form.Group>
+                 
 
+                )}
+          
+          
+            <Row>
+            <Col>
+            <Button type="submit" variant="info" disabled={isSubmitting}>
+                  {currentVendor ? 'Update' : 'Submit'}
+                </Button>{' '}
+            </Col>
+
+            <Col>
+            <Button
+                  variant="secondary"
+                  onClick={() => {
+                    toggleModal();
+                    setMess('');
+                    setCurrentVendor(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+            </Col>
+
+            </Row>
+                
+              
+               
+              </Form>
+            )}
+          </Formik>
+        </Modal.Body>
+      </Modal>
+    </Row>
   );
 };
 

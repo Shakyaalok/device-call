@@ -59,37 +59,6 @@ const Header = () => {
 
 
 
-  useEffect(() => {
-    if (debounceSearchTerm) {
-      const search = async () => {
-        try {
-          let categoryNameArray = location.pathname.split('/')
-          const category_id = categoryId(categoryNameArray);
-
-          const response = await axios.get('/search', {
-            headers: {
-              authorization: user_info.accessToken,
-              token: user_info.refreshToken
-            },
-            params:
-            {
-              category_id: category_id,
-              searchText: inputText
-            }
-          })
-
-          if (response?.data?.contents) {
-            dispatch({ type: 'filter', filterContent: { content: response.data.contents, status: response.status } })
-          }
-
-        } catch (error) {
-          dispatch({ type: 'filter', filterContent: { content: [], status: error.response.status } })
-        }
-      }
-      search();
-    }
-  }, [debounceSearchTerm, location])
-
 
   const submitHandler = (e)=>{
     e.preventDefault()
@@ -132,29 +101,14 @@ const Header = () => {
 
         <CCollapse className="navbar-collapse" color='success' visible={visible}>
 
-          <CForm className="d-flex search-lens-parent" onSubmit={submitHandler}>
-            <CFormInput className="me-2" placeholder="Search content eg. topic, module etc..." value={inputText} style={{ borderRadius: '15px', border: 'none' }} onChange={(e) => { inputSearchHandler(e) }} />
-            {!lensCrossToggler ? <FaSearch className='icons lens' style={{ fontSize: '1rem', color: 'teal' }} /> : <ImCross className='icons lens' style={{ fontSize: '1rem', color: 'teal' }} onClick={clearSearchedTextHandler} />}
-          </CForm>
 
           <CNavbarNav onClick={()=>setVisible(false)}>
             <CNavItem>
             </CNavItem>
             <CNavItem>
-              <CNavLink as={Link} to='/' active>Home</CNavLink>
+              <CNavLink as={Link} to='/' active>Device</CNavLink>
             </CNavItem>
-            <CNavItem>
-              <CNavLink as={Link} to='/k12' active>K12</CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink as={Link} to='/higher-ed' active>Higher Ed</CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink as={Link} to='/enterprises' active>Enterprises</CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink as={Link} to='/virtual-tour' active>Virtual Tour</CNavLink>
-            </CNavItem>
+           
             <CNavItem>
               {isLoggedIn === false ? <CNavLink as={Link} to='/login' active>Login</CNavLink> : <CNavLink as={Link} onClick={logoutHandler} active>Logout</CNavLink>}
             </CNavItem>
