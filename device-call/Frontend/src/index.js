@@ -1,15 +1,16 @@
 
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { RouterProvider } from 'react-router-dom';
 import router from './routes'
+import { icons } from './assets/icons'
+React.icons = icons
 
 
-
-
-const root = createRoot(document.getElementById('root'));
-root.render(
-  <RouterProvider router={router}/>
+// const root = createRoot(document.getElementById('root'));
+ReactDOM.render(
+  <RouterProvider router={router}/>,
+  document.getElementById('root')
 );
 
 

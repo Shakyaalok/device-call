@@ -1,0 +1,26 @@
+.card-container {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .button-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .card-container:hover .button-container {
+    opacity: 1;
+  }
+  
+  .btn-fullscreen,
+  .btn-notes {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+  }
+  

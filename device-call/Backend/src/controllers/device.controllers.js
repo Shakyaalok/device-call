@@ -17,6 +17,8 @@ exports.lauchDevice = async(req,res)=>{
         const id = req.query.id;
 
         const isFireBaseToken = await Device.findOne({where:{id}});
+        
+        console.log('tesiisin---------------------->',isFireBaseToken,req.query.id)
 
         const firebase_token = isFireBaseToken.dataValues.firebase_token
 
@@ -24,7 +26,8 @@ exports.lauchDevice = async(req,res)=>{
 
             console.log('-------------->',firebase_token)
 
-            let temp_token =  'eRi6W4X4TjWTxaxxIzgKm_:APA91bG9XJ1l6BGxwpR0gxxdgOUf_TkecwoxMm2nlyeExbQdppg7pzYG7PsV-zn3iTojwBWcUbibqW3wOBIF34TMCuedOcdXjiMghoLEmWKTMF65fHfo1Jo'
+            // let temp_token =  'eRi6W4X4TjWTxaxxIzgKm_:APA91bG9XJ1l6BGxwpR0gxxdgOUf_TkecwoxMm2nlyeExbQdppg7pzYG7PsV-zn3iTojwBWcUbibqW3wOBIF34TMCuedOcdXjiMghoLEmWKTMF65fHfo1Jo'
+            let temp_token =  'efVMn8fjTeC77ibUPyIxEj:APA91bGjVyb5_bk-X4canwLVepWTqo3NGqyRG0JydZ3_9LugTwwjSrnNs7ZhATztuB4tZSc-GEVoeqMBFFvsUnhegr60dfjgPtcEglEVFiuY5g4FFPoDE1I'
             const registrationToken = firebase_token || temp_token;  // Replace with the actual token
      
             const message = {
@@ -37,15 +40,14 @@ exports.lauchDevice = async(req,res)=>{
             // Send the message to the device
             admin.messaging().send(message)
                 .then((response) => {
-                    console.log('Successfully sent message:', response);
+                    // console.log('Successfully sent message:', response);
+                     return res.send({success:true, error:false, message:'Successfully sent message:'})
                 })
                 .catch((error) => {
-                    console.error('Error sending message:', error);
+                    return res.send({success:false, error:true, message:'Error sending message:'})
                 });
-           return  res.send({data:'this is working', success:true, error:false, message:'launching has been started'})
+        //    return  res.send({success:true, error:false, message:'launching has been started'})
         }
-        
-        res.send({message:'Unable to lauch device', success:false, error:true})
     } catch (error) {
         console.log('error---------->',error)
         res.send({message:error.message, success:false, error:true})
@@ -62,7 +64,7 @@ exports.getDevice = async(req,res)=>{
         exclude: ['firebase_token'] 
       }}) 
         
-     res.send({data:devices,message:'cannot update the data', success:true, error:false})
+     res.send({data:devices,message:'success', success:true, error:false})
 
     } catch (error) {
         console.log('error--->',error)

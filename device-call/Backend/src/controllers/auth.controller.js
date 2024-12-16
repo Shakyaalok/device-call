@@ -65,12 +65,12 @@ exports.login = async(req, res) => {
     let accessToken;
     let refreshToken;
     if(!email || ! password) {
-        return res.status(400).send({ error: true, message: 'Please provide all required field', accessToken: null, refreshToken: null })
+        return res.status(400).send({ error: true, message: 'Please provide all required field', error:false, success:true, accessToken: null, refreshToken: null })
     } 
 
     const user =  await Auth.findOne({where:{email}});
     if(!user){
-        return res.status(200).send({error:true, message:'No User Account Exists'})
+        return res.status(200).send({error:true, error:false, success:true, message:'No User Account Exists'})
     }
 
     // const match = await bcrypt.compare(password,user.password);
@@ -80,14 +80,14 @@ exports.login = async(req, res) => {
         refreshToken = jwt.sign({ username:  user.name},refreshTokenSecret);
        refreshTokens.push(refreshToken)
        const { password, ...userWithOutPass } = user.toJSON();       
-       return res.status(200).json({ accessToken, refreshToken, user: userWithOutPass })
+       return res.status(200).json({message:'Login Successfully !',error:false, success:true, accessToken, refreshToken, user: userWithOutPass })
     }   
 
-      res.status(200).json({ error:true, message:'Check your credentials', accessToken: null, refreshToken: null})
+      res.status(200).json({ error:true, message:'Check your credentials',error:false, success:true, accessToken: null, refreshToken: null})
 
    } catch (error) {
     console.log('error',error)
-    return res.status(200).json({error:true, message:'something went wrong', accessToken: null, refreshToken: null })
+    return res.status(200).json({error:true, message:'something went wrong',error:true, success:false, accessToken: null, refreshToken: null })
    }
 
 }

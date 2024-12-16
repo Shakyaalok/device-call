@@ -10,13 +10,14 @@ db.Op = Op
 db.fn = fn
 db.col = col
 
-db.k12 = require('./K12.model')(sequelize, DataTypes);
-db.Enterprises = require('./enterprises.models')(sequelize,DataTypes);
-db.HigherEd = require('./higherEd')(sequelize,DataTypes);
+
 db.User = require('./user')(sequelize,DataTypes)
 db.Device = require('./device.model')(sequelize,DataTypes)
+db.Inspection = require('./inspection.model')(sequelize,DataTypes)
+db.Department = require('./department.model')(sequelize,DataTypes)
+db.username_uuid = require('./username_uuid.model')(sequelize,DataTypes)
 
-db.sequelize.sync({alter : true})
+db.sequelize.sync({alter:true})
 .then(()=> {
     console.log('yes re-sync done!')
 })

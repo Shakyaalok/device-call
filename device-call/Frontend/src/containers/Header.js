@@ -1,122 +1,70 @@
-import React, { useState, useEffect } from 'react'
-import {
-  CContainer,
-  CNavbarBrand,
-  CCollapse,
-  CNavbarNav,
-  CNavItem,
-  CNavLink,
-  CNavbar,
-  CNavbarToggler,
-  CImage,
-  CFormInput,
-  CRow,
-  CForm
-} from '@coreui/react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import Logo from '../assets/icons/logo-white.png'
+import React, { useState, useEffect } from 'react';
+import { Navbar, Nav, Container } from 'react-bootstrap';
+import { Link, useNavigate } from 'react-router-dom';
+import Logo from '../assets/icons/logo-white.png';
 import '../views/Css/headers.css';
-import { isTokenExpire, categoryId } from '../views/gradeSubject';
-import { BsList } from "react-icons/bs";
-import { RxCross2 } from "react-icons/rx";
-import { FaSearch } from "react-icons/fa";
-import { ImCross } from "react-icons/im";
-import useDebounce from '../services/useDebounce';
-import axios from '../services/api'
-import { useDispatch } from 'react-redux';
-
-
+import { isTokenExpire } from '../utility/tokenExpiry';
+import { toast } from 'react-toastify';
 
 const Header = () => {
-  const [visible, setVisible] = useState(false);
-  const [isLoggedIn, setIsLogggedIn] = useState(false);
-  const [inputText, setInputText] = useState('');
-  const [lensCrossToggler, setLensCrossToggler] = useState(false);
+  const [visible, setVisible] = useState(false);  // Toggles navbar visibility
+  const [isLoggedIn, setIsLoggedIn] = useState(false);  // Manages login state
   const navigate = useNavigate();
-  const debounceSearchTerm = useDebounce(inputText);
   const user_info = JSON.parse(localStorage.getItem('user_info'));
-  const location = useLocation();
-  const dispatch = useDispatch();
 
-
+  // Handle token expiration and user login state
   useEffect(() => {
-    if (!user_info || isTokenExpire(user_info?.accessToken)) {
+    if (!user_info || isTokenExpire(user_info?.accessToken)) {      
+      toast.warning('You have been Logout ')
       localStorage.removeItem('user_info');
-      localStorage.removeItem('rcontent');
       navigate('/login');
-      setIsLogggedIn(false)
+      setIsLoggedIn(false);
     } else {
-      setIsLogggedIn(true)
+      setIsLoggedIn(true);
     }
-  }, [user_info, navigate])
+  }, [user_info, navigate]);
 
-
+  // Handle logout
   const logoutHandler = () => {
     localStorage.removeItem('user_info');
     localStorage.removeItem('rcontent');
+    toast.success('You have been Logout')
     navigate('/login');
-  }
-
-
-
-
-  const submitHandler = (e)=>{
-    e.preventDefault()
-  }
-  const inputSearchHandler = (e) => {
-   
-    const val = e.target.value;
-    if (val !== undefined || val !== null || val !== '') {
-      setInputText(val);
-      setLensCrossToggler(true);
-    }
-
-    if (val === '') {
-      setLensCrossToggler(false);
-      dispatch({ type: 'filter', filterContent: []})
-    }
-  }
-
-  const clearSearchedTextHandler = () => {
-    setInputText('');
-    setLensCrossToggler(false);
-    dispatch({ type: 'filter', filterContent: []})
-  }
-
+  };
 
   return (
-    <CNavbar expand="lg" className={`bg-body-teal fixed-header`} style={{padding:'0 0.5rem 0 1rem'}}>
-      <CContainer fluid style={{padding:'0'}}>
+    <Navbar expand="lg" className="bg-body-teal fixed-header" style={{ padding: '0 0.5rem 0 1rem' }}>
+      <Container fluid style={{ padding: '0' }}>
 
-        <CNavbarBrand as={Link} to='/'>
-          <CImage src={Logo} className='logo' />
-        </CNavbarBrand>
+        {/* Brand Logo */}
+        <Navbar.Brand as={Link} to="/">
+          <img src={Logo} className="logo" alt="Logo" />
+        </Navbar.Brand>
 
-        <CNavbarToggler>
-          <div onClick={() => setVisible(!visible)} className="navbar-toggler-button">
-            <span className="navbar-toggler-icon">  {visible ? <RxCross2 /> : <BsList />}</span>
-          </div>
-        </CNavbarToggler>
+        {/* Navbar Toggle Button */}
+        <Navbar.Toggle
+          aria-controls="navbar-nav"
+          onClick={() => setVisible(!visible)}
+          style={{color:'white'}}
+        >
+        </Navbar.Toggle>
 
+        {/* Navbar Collapse Section */}
+        <Navbar.Collapse id="navbar-nav">
+          <Nav className="ml-auto text-white" onClick={() => setVisible(false)}>
+            <Nav.Link as={Link} to="/" active className='text-white'>DashBoard</Nav.Link>
+            <Nav.Link as={Link} to="/devices" active className='text-white'>Device</Nav.Link>
+            <Nav.Item>
+              {isLoggedIn === false
+                ? <Nav.Link as={Link} to="/login" active  className='text-white'>Login</Nav.Link>
+                : <Nav.Link as={Link} onClick={logoutHandler} active  className='text-white'>Logout</Nav.Link>
+              }
+            </Nav.Item>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
+  );
+};
 
-        <CCollapse className="navbar-collapse" color='success' visible={visible}>
-
-
-          <CNavbarNav onClick={()=>setVisible(false)}>
-            <CNavItem>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink as={Link} to='/' active>Device</CNavLink>
-            </CNavItem>
-           
-            <CNavItem>
-              {isLoggedIn === false ? <CNavLink as={Link} to='/login' active>Login</CNavLink> : <CNavLink as={Link} onClick={logoutHandler} active>Logout</CNavLink>}
-            </CNavItem>
-          </CNavbarNav>
-        </CCollapse>
-      </CContainer>
-    </CNavbar>
-  )
-}
-
-export default Header
+export default Header;

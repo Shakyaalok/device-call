@@ -1,17 +1,15 @@
 import { createStore } from 'redux'
 
 const initialState = {
-  content:[],
-  filterContent : [{}]
+  data:[{}],
 }
 
 const changeState = (state = initialState, { type, ...rest }) => {
+  console.log('data in recus---------->',rest)
   switch (type) {
     case 'set':
       return {...state, ...rest }
 
-    case 'filter':
-      return {...state,...rest}
      default:
       return state
   }

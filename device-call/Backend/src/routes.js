@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('./controllers/auth.controller')
-const contentController = require('./controllers/content.controller')
 const deviceController = require('./controllers/device.controllers');
+const inspectionController = require('./controllers/inspection.controllers');
+const department = require('./controllers/department.controllers')
+const username_uuid = require('./controllers/username_uuid.controllers')
 
 router.post('/login', authController.login)
 router.post('/logout', authController.logout)
-
-
-// router.get('/contents',  authController.authenticateJWT,  contentController.getContents)
-// router.get('/k12',       authController.authenticateJWT,  contentController.K12);
-// router.get('/higher-ed', authController.authenticateJWT,  contentController.HigherEd);
-// router.get('/search',authController.authenticateJWT, contentController.Search)
 
 //devices
 
@@ -25,5 +21,18 @@ router.delete('/devices', deviceController.deleteDevice);
 // router.post('/devices',authController.authenticateJWT, deviceController.addDevice);
 // router.put('/devices',authController.authenticateJWT, deviceController.editDevice);
 // router.delete('/devices',authController.authenticateJWT, deviceController.deleteDevice);
+router.get('/school-name',inspectionController.getSchoolOrInspectorNameById)
+router.get('/inspection',inspectionController.getInspectionDetails)
+router.post('/inspection',inspectionController.addInspectionDetails)
+router.post('/filter',inspectionController.getFilterData)
+
+//departments
+router.get('/department',department.getDepartment)
+router.post('/department',department.addDepartment)
+
+// uuid
+router.post('/uuid', username_uuid.addUUID);
+router.get('/uuid', username_uuid.getUUID);
+router.delete('/uuid', username_uuid.deleteUUID);
 
 module.exports = router;

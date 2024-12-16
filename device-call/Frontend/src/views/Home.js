@@ -1,21 +1,47 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Row, Modal, Form, FormControl, Table } from 'react-bootstrap';
+import {  Modal} from 'react-bootstrap';
 import { Formik } from 'formik';
 import axios from '../services/api';
-import './Css/home.css';
+import {
+  CCard,
+  CCardHeader,
+  CCardBody,
+  CButton,
+  CRow,
+  CCol,
+  CDataTable,
+  CModal,
+  CModalBody,
+  CModalHeader,
+  CInput,
+  CLabel,
+  CFormText,
+  CFormGroup,
+  CSelect,
+} from '@coreui/react'
+
+import { useDispatch } from 'react-redux';
+import CIcon from '@coreui/icons-react'
+import { toast } from 'react-toastify';
+
 
 const Home = () => {
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [mess, setMess] = useState('');
   const [currentVendor, setCurrentVendor] = useState(null); // State to hold the current vendor data for editing
-  const [check,setChecked] = useState(false);
-
+  const [check, setChecked] = useState(false);
   const user_info = JSON.parse(localStorage.getItem('user_info'));
+  const [pop, setPop] = useState(false);
+  const [headings, setHeadings] = useState([{key: 'CheckBox', label: 'Select devices' },{ key: 'device_id', label: "Device Id" }, { key: "inspector_name", label: "Inspector Name" }, { key: "school_name", label: "School Name" }, { key: 'actions', label: "Actions" }])
+  const [multiCheckBox, setMultiCheckBox] = useState([]);
+  const dispatch = useDispatch();
 
-  const getList = async () => {
+
+
+
+const getList = async () => {
     const res = await axios.get('/devices', {
       // headers: {
       //   authorization: user_info.accessToken,
@@ -24,6 +50,9 @@ const Home = () => {
     });
     if (!res.data.error) {
       setData(res.data.data);
+      toast.success(res.data.message)
+    }else{
+      toast.error(res.data.message)
     }
   };
 
@@ -35,9 +64,12 @@ const Home = () => {
     setShowModal(!showModal);
   };
 
+  const togglePop = () => {
+    setPop(!pop);
+  };
+
   const handleEditClick = async (vendor) => {
-    setCurrentVendor(vendor); // Set the current vendor to the selected one for editing
-    setMess('');
+    setCurrentVendor(vendor); 
     toggleModal();
   };
 
@@ -51,11 +83,14 @@ const Home = () => {
     });
     if (!res.data.error) {
       getList();
+      toast.success(res.data.message)
+    }else{
+      toast.error(res.data.message)
     }
   };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    console.log('values tesing------------>',values);
+    console.log('values tesing------------>', values);
     // return;
     try {
       let res;
@@ -67,12 +102,13 @@ const Home = () => {
           },
           params: {
             id: currentVendor.id,
-            force_update:check? check: false
+            force_update: check ? check : false
           },
         });
+
       } else {
-     
-      
+
+
         res = await axios.post('/devices', values, {
           headers: {
             authorization: user_info.accessToken,
@@ -86,10 +122,12 @@ const Home = () => {
         toggleModal();
         resetForm();
         setCurrentVendor(null);
+        toast.success(res.data.message)
       } else {
-        setMess(res.data.message);
+        toast.error(res.data.message)
       }
     } catch (error) {
+      toast.error('something went wrong !')
       console.log(error);
     }
     setSubmitting(false);
@@ -113,105 +151,139 @@ const Home = () => {
   };
 
 
-  
 
-  const checkBoxHandler = (e) =>{
+
+  const checkBoxHandler = (e) => {
     setChecked(e.target.checked)
   }
 
-  const launchDeviceHandler = async(id)=>{
+  const launchDeviceHandler = async (id) => {
+
     const res = await axios.get('/devices/launch', {
       // headers: {
       //   authorization: user_info.accessToken,
       //   token: user_info.refreshToken,
       // },
-      params:{
-        id:id
+      params: {
+        id: id
       }
     });
     if (!res.data.error) {
-      alert(res.data.message)
+      setPop(true)
+      toast.success(res.data.message)
+    }else{
+      toast.error(res.data.message)
     }
-    alert(res.data.message)
   }
 
+
+
+// multiSelectHandler
+  const multiSelectHandler = (e) => {
+    setMultiCheckBox((prevState) => {
+      if (prevState.includes(e.target.value)) {
+        return prevState.filter((value) => value !== e.target.value); 
+      }
+      return [...prevState, e.target.value];
+    });
+
+  }
+
+  const multiDeviceLaunchHandler = () => {
+    headings.push({ key: '', label: 'Ch' })
+    dispatch({ type: 'set', data: multiCheckBox })
+    navigate('/stream')
+    launchDeviceHandler(2)
+  }
+
+
+
   return (
-    <Row className="justify-content-center">
-      <Col md="12">
-        <Card>
-          <Card.Header>
-            <Row>
-              <Col>
-                <Button
-                  variant="info"
-                  className="mt-5"
+    <CRow className="justify-content-center mt-5">
+      <CCol md={12}>
+        <CCard>
+          <CCardHeader>
+            <CRow>
+              <CCol>
+                <CButton
+                  className="px-5"
+                  color="info"
                   onClick={() => {
                     setCurrentVendor(null);
                     toggleModal();
-                  }}
-                >
+                  }}>
                   + Add New
-                </Button>
-              </Col>
-            </Row>
-          </Card.Header>
-          <Card.Body>
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Device Id</th>
-                  <th>Inspector Name</th>
-                  <th>School Name</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.device_id}</td>
-                    <td>{item.inspector_name}</td>
-                    <td>{item.school_name}</td>
-                    <td>{item.status}</td>
-                    <td>
-                      <Button
-                        variant="warning"
-                        size="sm"
-                        onClick={() => handleEditClick(item)}
-                      >
-                        Edit
-                      </Button>{' '}
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleDeleteClick(item.id)}
-                      >
-                        Delete
-                      </Button>{' '}
-                      <Button variant="success" size="sm" onClick={()=>launchDeviceHandler(item.id)}>
-                        Launch
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Card.Body>
-        </Card>
-      </Col>
+                </CButton>
 
-      <Modal show={showModal} onHide={toggleModal} size="lg">
-        <Modal.Header closeButton>
+                {multiCheckBox.length > 0 && (
+                  <CButton
+                    className="px-5 ml-5"
+                    color="success"
+                    onClick={multiDeviceLaunchHandler}
+
+                  >
+                    Launch Devices {" "+ multiCheckBox.length > 0 && multiCheckBox.length + ' Devices ' + 'selected' }
+                  </CButton>
+                )}
+
+              </CCol>
+            </CRow>
+          </CCardHeader>
+          <CCardBody>
+            <CDataTable
+              items={data}
+              fields={headings}
+              itemsPerPageSelect
+              itemsPerPage={5}
+              pagination
+              tableFilter
+              scopedSlots={{
+                actions: (item) => (
+                  <td>
+                    <CRow>
+                      <CButton onClick={() => handleEditClick(item)} className={'btn-pill'} size={'sm'} > <CIcon className={'cust_action_edit'} name={'cilPencil'} /></CButton>
+                      <CButton onClick={() => handleDeleteClick(item.id)} className={'btn-pill'} size={'sm'} ><CIcon className={'cust_action_delete'} name={'cilTrash'} /></CButton>
+                      <CButton onClick={() => launchDeviceHandler(item.id)} className={'btn-pill'} size={'sm'} ><CIcon className={'cust_action_delete'} name={'cilBadge'} /></CButton>
+                    </CRow>
+                  </td>
+                ),
+                "CheckBox":(item)=>(
+                  <td className='d-flex align-items-center justify-content-stretch'>
+                      <CCol xs="auto">
+                      <CInput
+                      type="checkbox"
+                      id="inlineCheckbox1"
+                      value={item.id}
+                      label={item.id}
+                      onChange={multiSelectHandler}
+                      style={{height:'24px', width:'24px',margin:'0'}}
+                    />
+                      </CCol>
+                      <CCol xs="auto">
+                      {item.device_id}
+                      </CCol>
+                  </td>
+                )
+              }}
+            />
+          </CCardBody>
+        </CCard>
+      </CCol>
+
+
+      {/* Add and edit Modal */}
+      <CModal show={showModal} onHide={toggleModal} size="lg">
+        <CModalHeader closeButton>
           <Modal.Title>{currentVendor ? 'Edit Vendor' : 'Add New Vendor'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        </CModalHeader>
+        <CModalBody>
           <Formik
             initialValues={{
               inspector_name: currentVendor ? currentVendor.inspector_name : '',
               school_name: currentVendor ? currentVendor.school_name : '',
               status: currentVendor ? currentVendor.status : '',
-              isChecked: currentVendor ? currentVendor.isChecked : false, // Default to false
-              device_id: currentVendor ? currentVendor.device_id : '', // Default to false
+              isChecked: currentVendor ? currentVendor.isChecked : false, 
+              device_id: currentVendor ? currentVendor.device_id : '', 
             }}
             validate={validate}
             onSubmit={handleSubmit}
@@ -226,10 +298,10 @@ const Home = () => {
               handleSubmit,
               isSubmitting,
             }) => (
-              <Form onSubmit={handleSubmit}>
-                 <Form.Group controlId="device_id">
-                  <Form.Label>Inspector Name</Form.Label>
-                  <FormControl
+              <form onSubmit={handleSubmit}>
+                <CFormGroup>
+                  <CLabel>Inspector Name</CLabel>
+                  <CInput
                     type="text"
                     name="device_id"
                     placeholder="Enter Device id"
@@ -238,12 +310,12 @@ const Home = () => {
                     onBlur={handleBlur}
                   />
                   {touched.device_id && errors.device_id && (
-                    <Form.Text className="text-danger">{errors.device_id}</Form.Text>
+                    <CFormText className="text-danger">{errors.device_id}</CFormText>
                   )}
-                </Form.Group>
-                <Form.Group controlId="inspector_name">
-                  <Form.Label>Inspector Name</Form.Label>
-                  <FormControl
+                </CFormGroup>
+                <CFormGroup controlId="inspector_name">
+                  <CLabel>Inspector Name</CLabel>
+                  <CInput
                     type="text"
                     name="inspector_name"
                     placeholder="Enter Inspector Name"
@@ -252,12 +324,12 @@ const Home = () => {
                     onBlur={handleBlur}
                   />
                   {touched.inspector_name && errors.inspector_name && (
-                    <Form.Text className="text-danger">{errors.inspector_name}</Form.Text>
+                    <CFormText className="text-danger">{errors.inspector_name}</CFormText>
                   )}
-                </Form.Group>
-                <Form.Group controlId="school_name">
-                  <Form.Label>School Name</Form.Label>
-                  <FormControl
+                </CFormGroup>
+                <CFormGroup controlId="school_name">
+                  <CLabel>School Name</CLabel>
+                  <CInput
                     type="text"
                     name="school_name"
                     placeholder="Enter School Name"
@@ -266,12 +338,12 @@ const Home = () => {
                     onBlur={handleBlur}
                   />
                   {touched.school_name && errors.school_name && (
-                    <Form.Text className="text-danger">{errors.school_name}</Form.Text>
+                    <CFormText className="text-danger">{errors.school_name}</CFormText>
                   )}
-                </Form.Group>
-                <Form.Group controlId="status">
-                  <Form.Label>Status</Form.Label>
-                  <Form.Control
+                </CFormGroup>
+                <CFormGroup controlId="status">
+                  <CLabel>Status</CLabel>
+                  <CSelect
                     as="select"
                     name="status"
                     value={values.status}
@@ -281,60 +353,67 @@ const Home = () => {
                     <option value="" disabled>Select Vendor Status</option>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
-                  </Form.Control>
-                  {/* {touched.status && errors.status && (
-                    <Form.Text className="text-danger">{errors.status}</Form.Text>
-                  )} */}
-                </Form.Group>
-                
+                  </CSelect>
+                </CFormGroup>
+
                 {/* Checkbox Field */}
                 {currentVendor && (
-                   <Form.Group controlId="isChecked">
-                   <Form.Check
-                     type="checkbox"
-                     name="isChecked"
-                     label="Force update"
-                     value={check}
-                    //  checked={values.isChecked}
-                     onChange={(e)=>checkBoxHandler(e)}
-                     onBlur={handleBlur}
-                   />
-                 </Form.Group>
-                 
-
+                  <CFormGroup controlId="isChecked">
+                    <CInput
+                      type="checkbox"
+                      name="isChecked"
+                      label="Force update"
+                      value={check}
+                      onChange={(e) => checkBoxHandler(e)}
+                      onBlur={handleBlur}
+                    />
+                  </CFormGroup>
                 )}
-          
-          
-            <Row>
-            <Col>
-            <Button type="submit" variant="info" disabled={isSubmitting}>
-                  {currentVendor ? 'Update' : 'Submit'}
-                </Button>{' '}
-            </Col>
 
-            <Col>
-            <Button
-                  variant="secondary"
+
+
+                <CButton type="submit" color="info" disabled={isSubmitting}>
+                  {currentVendor ? 'Update' : 'Submit'}
+                </CButton>{' '}
+
+                <CButton
+                  color="secondary"
                   onClick={() => {
                     toggleModal();
-                    setMess('');
                     setCurrentVendor(null);
                   }}
                 >
                   Cancel
-                </Button>
-            </Col>
+                </CButton>
 
-            </Row>
-                
-              
-               
-              </Form>
+              </form>
             )}
           </Formik>
-        </Modal.Body>
-      </Modal>
-    </Row>
+        </CModalBody>
+      </CModal>
+
+      {/* launch Modal */}
+
+      <CModal show={pop} onHide={togglePop} size="lg" dialogClassName="fullscreen-modal">
+        <CModalHeader closeButton>Launch Device</CModalHeader>
+        <CModalBody style={{ padding: 0, height: 'calc(65vh)' }}>
+          <iframe
+            src="http://localhost:5000/"
+            width="100%"
+            height="100%" 
+            title="Launch Device"
+            style={{ border: 'none' }} 
+          />
+        </CModalBody>
+        <CButton color="secondary" onClick={togglePop}>
+          Close
+        </CButton>
+      </CModal>
+
+
+    </CRow>
+
+
   );
 };
 
